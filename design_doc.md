@@ -47,12 +47,14 @@ API通知网关系统架构设计与工程实践报告
 3.2 关键组件技术选型分析
 3.2.1 消息队列选型：Redis vs. Kafka/RabbitMQ
 在4小时MVP的约束下，队列选型必须权衡吞吐量、持久性与运维复杂度。
+
 | 特性 | Redis (List/Stream) | RabbitMQ | Apache Kafka | 选型分析 |
 |---|---|---|---|---|
 | 部署复杂度 | 极低（单容器，轻量级） | 中等（需Erlang环境） | 高（依赖ZooKeeper/KRaft） | Redis胜出。在MVP阶段，快速搭建环境至关重要。 |
 | 持久性 | 中等（RDB/AOF，可能丢数据） | 高（Ack机制，磁盘持久化） | 极高（Log机制） | Redis RDB/AOF在大多数非金融级通知场景下可接受。 |
 | 延迟 | 亚毫秒级 | 毫秒级 | 毫秒级（取决于Batch） | Redis延迟最低，适合实时通知。 |
 | 生态支持 | 极佳（Python RQ, Sidekiq） | 良好（Celery） | 良好（Python Kafka） | Python RQ基于Redis，开箱即用，代码量极少。 |
+
 决策：选用 Redis 配合 Python RQ (Redis Queue)。RQ 是一个基于 Redis 的轻量级队列库，它天然支持任务的入队、出队、重试调度和结果存储，非常适合中小型规模的异步任务处理。相比于Celery庞大的配置项，RQ更符合MVP“简单可控”的原则。虽然Redis在极端宕机情况下可能丢失内存中的少量数据，但通过配置AOF（Append Only File）每秒刷盘，可以在性能与可靠性之间取得合理的平衡。
 3.2.2 存储选型：Redis vs. SQL Database
 系统需要存储两类数据：静态的Vendor配置（如API URL、模板）和动态的任务状态（如Task ID、Status）。
