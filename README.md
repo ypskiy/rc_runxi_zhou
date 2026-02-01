@@ -40,4 +40,4 @@ rc_project/
 *   **模板选型**: 采纳了 AI 推荐的 `Jinja2` 替代简单的字符串格式化，以支持复杂逻辑。
 *   **拒绝的建议**: 拒绝了 AI 推荐的 `Celery` (过重) 和 `PostgreSQL Transactional Outbox` (MVP 复杂度过高)。
 
-详细设计请参考 `tutorial.md` (原始设计文档)。
+详细设计请参考 [design_doc.md](https://github.com/ypskiy/rc_runxi_zhou/blob/main/design_doc.md) (原始设计文档)。
