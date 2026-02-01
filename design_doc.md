@@ -119,6 +119,7 @@ API通知网关系统架构设计与工程实践报告
  * 处理流程：将该Job移动到名为 failed 的Redis Registry中（RQ默认行为）。
  * 告警：监控系统应检测 failed 队列的增长并触发告警。
  * 处置：提供脚本或API，允许运维人员在修复配置或确认外部系统恢复后，将死信队列中的任务重新入队（Replay）。
+
 5. 安全性与隔离设计
 5.1 出站安全（Egress Security）
 网关作为向外发起请求的组件，容易成为SSRF（服务端请求伪造）攻击的跳板。攻击者可能诱导网关向内网地址（如 http://localhost:6379 或 http://169.254.169.254）发送请求，窃取元数据或攻击内部服务。
@@ -131,6 +132,7 @@ API通知网关系统架构设计与工程实践报告
  * 共享队列模式：所有Vendor的任务混在一个队列。缺点：Vendor A的积压会阻塞Vendor B。
  * 独立队列模式：为每个Vendor（或每类优先级）创建独立队列（queue:vendor_a, queue:vendor_b）。
    决策：MVP阶段采用优先级队列（High, Default, Low）。核心业务通知走High队列，普通通知走Default。这在复杂度和隔离性之间取得了平衡。RQ Worker可以配置为按顺序消费这些队列（rq worker high default low）。
+
 6. MVP系统实现细节
 本章节将展示基于 Python 和 Redis 的核心代码实现。代码遵循模块化设计，分为配置、分发、执行与工具模块。
 6.1 项目结构
